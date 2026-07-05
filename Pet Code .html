@@ -1,0 +1,1645 @@
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetCode | Planos de Saúde Veterinários Inteligentes</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        saude: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6', // Verde-água tech
+                            600: '#0d9488',
+                            700: '#0f766e',
+                        },
+                        azul: {
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Animações e Transições */
+        .accordion-content { transition: max-height 0.3s ease-in-out, padding 0.3s ease; max-height: 0; overflow: hidden; }
+        .accordion-content.open { max-height: 200px; padding-bottom: 1rem; }
+        .card-frente, .card-verso { transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); backface-visibility: hidden; }
+        .preserve-3d { transform-style: preserve-3d; }
+        .card-verso { transform: rotateY(180deg); }
+        /* Fluidez Global e Transições de Visão */
+        html { scroll-behavior: smooth; }
+        
+        .view-transition { animation: viewFadeIn 0.4s ease-out forwards; }
+        
+        @keyframes viewFadeIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .card-frente, .card-verso { transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); backface-visibility: hidden; }
+        .preserve-3d { transform-style: preserve-3d; }
+        .card-verso { transform: rotateY(180deg); }
+        .group:hover .card-frente, .group.active .card-frente { transform: rotateY(-180deg); }
+        .group:hover .card-verso, .group.active .card-verso { transform: rotateY(0deg); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    
+    <!-- MENU MOBILE OVERLAY -->
+    <div id="menu-mobile" class="hidden fixed inset-0 bg-white z-[100] flex-col p-6 view-transition overflow-y-auto">
+        <div class="flex items-center justify-between mb-12">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-saude-500 rounded-xl flex items-center justify-center text-white text-xl">
+                    <i class="fa-solid fa-code"></i>
+                </div>
+                <span class="text-2xl font-bold text-slate-900 tracking-tight">Pet<span class="text-saude-500">Code</span></span>
+            </div>
+            <button onclick="toggleMenuMobile()" class="text-slate-400 hover:text-slate-700 text-3xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col space-y-6">
+            <a href="#inicio" onclick="toggleMenuMobile(); navegarPara('home')" class="text-xl font-bold text-slate-700 border-b border-slate-50 pb-4">Início</a>
+            <a href="#quiz" onclick="toggleMenuMobile(); navegarPara('home')" class="text-xl font-bold text-slate-700 border-b border-slate-50 pb-4">Simulador de Plano</a>
+            <a href="#calculadora" onclick="toggleMenuMobile(); navegarPara('home')" class="text-xl font-bold text-slate-700 border-b border-slate-50 pb-4">Idade Humana</a>
+            <a href="#rede" onclick="toggleMenuMobile(); navegarPara('home')" class="text-xl font-bold text-slate-700 border-b border-slate-50 pb-4">Clínicas Próximas</a>
+            <a href="#planos" onclick="toggleMenuMobile(); navegarPara('home')" class="text-xl font-bold text-slate-700 border-b border-slate-50 pb-4">Planos</a>
+            <a href="#dicas" onclick="toggleMenuMobile(); navegarPara('home')" class="text-xl font-bold text-slate-700 border-b border-slate-50 pb-4">Conteúdos</a>
+            <div id="mobile-auth-section" class="pt-6 flex flex-col space-y-4">
+                <!-- Conteúdo de autenticação mobile injetado via JS -->
+            </div>
+        </nav>
+    </div>
+
+    <!-- MENU SUPERIOR -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Lado Esquerdo: Logo -->
+            <div class="flex items-center w-48">
+                <div class="flex items-center space-x-2 cursor-pointer" onclick="navegarPara('home')">
+                    <div class="w-10 h-10 bg-saude-500 rounded-xl flex items-center justify-center text-white text-xl shadow-md shadow-saude-500/20">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-slate-900 tracking-tight">Pet<span class="text-saude-500">Code</span></span>
+                </div>
+            </div>
+            
+            <!-- Centro: Navegação -->
+            <nav class="hidden lg:flex items-center justify-center space-x-6 xl:space-x-8 font-medium text-slate-600 flex-1">
+                <a href="#inicio" onclick="navegarPara('home')" class="hover:text-saude-600 transition-colors whitespace-nowrap">Início</a>
+                <a href="#quiz" onclick="navegarPara('home')" class="hover:text-saude-600 transition-colors whitespace-nowrap">Simulador de Plano</a>
+                <a href="#calculadora" onclick="navegarPara('home')" class="hover:text-saude-600 transition-colors whitespace-nowrap">Idade Humana</a>
+                <a href="#rede" onclick="navegarPara('home')" class="hover:text-saude-600 transition-colors whitespace-nowrap">Clínicas Próximas</a>
+                <a href="#planos" onclick="navegarPara('home')" class="hover:text-saude-600 transition-colors whitespace-nowrap">Planos</a>
+                <a href="#dicas" onclick="navegarPara('home')" class="hover:text-saude-600 transition-colors whitespace-nowrap">Conteúdos</a>
+            </nav>
+
+            <!-- Lado Direito: Ações de Usuário (Desktop) -->
+            <div class="hidden lg:flex items-center justify-end space-x-4 xl:space-x-8 w-auto min-w-[200px] xl:min-w-[280px]">
+                <div id="usuario-secao" class="flex items-center space-x-3 relative">
+                    <button id="btn-admin-panel" onclick="navegarPara('admin')" class="hidden bg-amber-100 text-amber-700 px-3 py-1 rounded-lg text-xs font-bold border border-amber-200 hover:bg-amber-200 transition-all">
+                        <i class="fa-solid fa-lock mr-1"></i> Painel Admin
+                    </button>
+                    
+                    <div class="relative">
+                        <button onclick="toggleMenuUsuario()" class="flex items-center space-x-2 focus:outline-none group">
+                            <span id="nome-usuario" class="text-sm font-bold text-slate-700 whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">Conta</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-hover:text-saude-500 transition-colors"></i>
+                        </button>
+                        
+                        <!-- Dropdown de Usuário -->
+                        <div id="dropdown-usuario" class="hidden absolute right-0 mt-3 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl z-[60] py-2 overflow-hidden">
+                            <div id="menu-logado" class="hidden">
+                                <button onclick="navegarPara('conta')" class="w-full text-left px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-saude-600 flex items-center transition-colors">
+                                    <i class="fa-solid fa-circle-user mr-2 text-slate-400"></i> Minha Conta
+                                </button>
+                                <div class="border-t border-slate-50 my-1"></div>
+                                <button onclick="logoutUsuario()" class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 flex items-center transition-colors">
+                                    <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Sair
+                                </button>
+                            </div>
+                            <div id="menu-deslogado">
+                                <button onclick="abrirModalLogin()" class="w-full text-left px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-saude-600 flex items-center transition-colors">
+                                    <i class="fa-solid fa-right-to-bracket mr-2 text-slate-400"></i> Entrar / Cadastrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-assinar" onclick="abrirCadastro('Plus')" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-medium shadow-md transition-all">Assinar Agora</button>
+            </div>
+            
+            <!-- Botão Menu Mobile (Hamburger) -->
+            <button onclick="toggleMenuMobile()" class="lg:hidden text-slate-600 p-2 focus:outline-none hover:bg-slate-50 rounded-lg transition-colors">
+                <i class="fa-solid fa-bars text-2xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- VISÃO 1: PÁGINA INICIAL (HOME) -->
+    <main id="view-home" class="block view-transition">
+        
+        <!-- BANNER PRINCIPAL (HERO) -->
+        <section id="inicio" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <span class="bg-saude-100 text-saude-700 font-semibold px-4 py-1.5 rounded-full text-sm inline-block">A evolução da saúde veterinária</span>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-950 leading-tight">
+                    O plano de saúde com o <span class="text-saude-500">código genético</span> do cuidado.
+                </h1>
+                <p class="text-lg text-slate-600 max-w-lg">
+                    Acesso a clínicas 24h, exames, vacinas e cirurgias. A tecnologia do PetCode garante atendimento rápido e sem burocracia para seu melhor amigo.
+                </p>
+                <div class="pt-2 flex flex-wrap gap-4">
+                    <button onclick="document.getElementById('quiz').scrollIntoView({behavior: 'smooth'})" class="bg-saude-500 hover:bg-saude-600 text-white text-lg px-8 py-4 rounded-xl font-semibold shadow-lg shadow-saude-500/30 transition-all transform hover:-translate-y-0.5">
+                        Simular Plano <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
+                    </button>
+                    <button onclick="document.getElementById('calculadora').scrollIntoView({behavior: 'smooth'})" class="bg-white border-2 border-slate-200 hover:border-slate-900 text-slate-700 text-lg px-6 py-4 rounded-xl font-semibold transition-all">
+                        Calcular Idade Pet 🐶
+                    </button>
+                </div>
+            </div>
+            
+            <div class="relative flex justify-center">
+                <div class="w-72 h-72 sm:w-96 sm:h-96 bg-gradient-to-tr from-saude-500 to-azul-500 rounded-full absolute -z-10 opacity-20 blur-2xl"></div>
+                <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 max-w-sm relative w-full">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-saude-100 text-saude-600 rounded-full flex items-center justify-center text-xl font-bold">🐱</div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Luna</h4>
+                                <p class="text-xs text-slate-500">PetCode Plus • ID: #9842</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-qrcode text-2xl text-slate-300"></i>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 flex justify-between items-center">
+                            <span class="text-sm font-medium text-slate-600"><i class="fa-solid fa-syringe text-saude-500 mr-2"></i> Vacina Múltipla</span>
+                            <span class="text-xs bg-green-100 text-green-700 font-bold px-2 py-1 rounded">Em Dia</span>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 flex justify-between items-center">
+                            <span class="text-sm font-medium text-slate-600"><i class="fa-solid fa-user-doctor text-azul-500 mr-2"></i> Última Consulta</span>
+                            <span class="text-xs text-slate-500">Há 15 dias</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ DO PLANO IDEAL -->
+        <section id="quiz" class="bg-slate-900 py-20 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10" style="background-image: radial-gradient(#14b8a6 1px, transparent 1px); background-size: 20px 20px;"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <h2 class="text-3xl font-extrabold text-white tracking-tight mb-4">Simulador de Plano Ideal 🤖</h2>
+                <p class="text-slate-400 mb-8">Responda às perguntas abaixo e nosso algoritmo indicará a melhor opção.</p>
+                
+                <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl text-left max-w-4xl mx-auto">
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">1. Espécie do Pet</label>
+                            <select id="q-especie" onchange="togglePorteVisibilityQuiz()" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                                <option value="cao">Cachorro</option>
+                                <option value="gato">Gato</option>
+                                <option value="coelho">Coelho</option>
+                                <option value="hamster">Hamster</option>
+                                <option value="passaro">Pássaro</option>
+                                <option value="porquinho">Porquinho da Índia</option>
+                                <option value="tartaruga">Tartaruga</option>
+                            </select>
+                        </div>
+                        <div id="wrapper-q-porte">
+                            <label class="block text-sm font-bold text-slate-700 mb-2">2. Porte</label>
+                            <select id="q-porte" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                                <option value="pequeno">Pequeno (até 10kg)</option>
+                                <option value="medio">Médio (11-25kg)</option>
+                                <option value="grande">Grande (+25kg)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">3. Raça (Opcional)</label>
+                            <input type="text" id="q-raca" placeholder="Ex: Golden, Poodle..." class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">4. Idade Aproximada</label>
+                            <select id="q-idade" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                                <option value="filhote">Filhote (0 a 1 ano)</option>
+                                <option value="adulto">Adulto (1 a 7 anos)</option>
+                                <option value="idoso">Idoso (Mais de 7 anos)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">5. Estilo de Vida</label>
+                            <select id="q-estilo" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                                <option value="caseiro">Fica mais em casa</option>
+                                <option value="aventureiro">Passeia muito na rua/parques</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 text-center" id="quiz-btn-container">
+                        <button onclick="calcularQuiz()" class="bg-saude-500 hover:bg-saude-600 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-md">Descobrir Plano Recomendado</button>
+                    </div>
+
+                    <div id="quiz-resultado" class="hidden mt-6 bg-saude-50 border border-saude-200 p-6 rounded-2xl text-center">
+                        <p class="text-sm text-saude-700 font-bold mb-1">Análise concluída!</p>
+                        <h4 class="text-2xl font-black text-slate-900 mb-2">Recomendamos o <span id="res-plano" class="text-saude-600">Plano Plus</span></h4>
+                        <p id="res-motivo" class="text-slate-600 text-sm mb-4">Ideal para garantir a proteção de rotina e imprevistos diários.</p>
+                        <button onclick="document.getElementById('planos').scrollIntoView({behavior: 'smooth'})" class="bg-slate-900 hover:bg-slate-800 text-white py-2 px-6 rounded-lg font-medium text-sm transition-colors">Ir para os Planos</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALCULADORA DE IDADE HUMANA -->
+        <section id="calculadora" class="bg-slate-100 py-20 border-y border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl font-extrabold text-slate-950 tracking-tight mb-2">Calculadora de Idade Humana 🧠</h2>
+                <p class="text-slate-600 mb-8">Você sabe quantos anos o seu pet teria se ele fosse um ser humano? Descubra agora!</p>
+                
+                <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-md max-w-4xl mx-auto grid lg:grid-cols-3 gap-6 text-left items-start">
+                    <div class="lg:col-span-2 grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Espécie</label>
+                            <select id="calc-especie" onchange="togglePorteVisibility(); calcularIdadeHumana()" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                                <option value="cao">Cachorro</option>
+                                <option value="gato">Gato</option>
+                                <option value="coelho">Coelho</option>
+                                <option value="hamster">Hamster</option>
+                                <option value="passaro">Pássaro</option>
+                                <option value="porquinho">Porquinho da Índia</option>
+                                <option value="tartaruga">Tartaruga</option>
+                            </select>
+                        </div>
+                        <div id="wrapper-porte">
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Porte</label>
+                            <select id="calc-porte" onchange="calcularIdadeHumana()" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                                <option value="pequeno">Pequeno (até 10kg)</option>
+                                <option value="medio">Médio (11-25kg)</option>
+                                <option value="grande">Grande (+25kg)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Raça (Se houver)</label>
+                            <input type="text" id="calc-raca" placeholder="Ex: Golden, Siamês..." class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1.5">Idade do Pet (em anos)</label>
+                            <input type="number" id="calc-idade" oninput="calcularIdadeHumana()" min="1" max="25" value="3" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                        </div>
+                    </div>
+                    
+                    <!-- Painel de Exibição do Resultado -->
+                    <div class="bg-gradient-to-br from-saude-500 to-teal-600 rounded-2xl p-6 text-white text-center flex flex-col justify-center h-full min-h-[180px]">
+                        <p class="text-xs uppercase font-extrabold tracking-wider opacity-80">Idade Humana Estimada</p>
+                        <h3 id="calc-resultado-num" class="text-5xl font-black my-2">28</h3>
+                        <p id="calc-resultado-texto" class="text-sm font-medium opacity-90">Anos humanos. Seu pet está na flor da juventude adulta!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BUSCA DE CLÍNICAS (REDE CREDENCIADA) -->
+        <section id="rede" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12 space-y-4">
+                <h2 class="text-3xl font-extrabold text-slate-950 tracking-tight">Clínicas Parceiras Perto de Você 📍</h2>
+                <p class="text-slate-600">Temos centenas de hospitais credenciados. Digite seu CEP para simular os locais de atendimento mais próximos.</p>
+                
+                <div class="pt-4 flex max-w-md mx-auto gap-3">
+                    <input type="text" id="cep-input" maxlength="9" placeholder="Digite seu CEP (Ex: 01000-000)" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-saude-500 text-center font-semibold">
+                    <button onclick="simularBuscaRede()" class="bg-saude-500 hover:bg-saude-600 text-white font-bold px-6 rounded-xl transition-colors whitespace-nowrap">Buscar Rede</button>
+                </div>
+            </div>
+
+            <!-- Loader de Busca -->
+            <div id="rede-loader" class="hidden text-center py-8">
+                <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-saude-500 rounded-full" role="status"></div>
+                <p class="text-xs text-slate-500 mt-2 font-bold uppercase tracking-wider">Escaneando rede credenciada PetCode...</p>
+            </div>
+
+            <!-- Lista de Clínicas Simuladas -->
+            <div id="rede-resultados" class="hidden grid sm:grid-cols-3 gap-6 animate-fade-in">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-start space-x-4">
+                    <div class="text-2xl text-saude-500 bg-saude-50 p-3 rounded-xl"><i class="fa-solid fa-hospital"></i></div>
+                    <div>
+                        <h4 class="font-bold text-slate-900">Hospital Veterinário Alfa 24h</h4>
+                        <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-location-dot mr-1"></i> A 1.2 km de você • Centro</p>
+                        <span class="text-[10px] bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded mt-2 inline-block">Pronto-Atendimento Emergencial</span>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-start space-x-4">
+                    <div class="text-2xl text-azul-500 bg-blue-50 p-3 rounded-xl"><i class="fa-solid fa-house-medical"></i></div>
+                    <div>
+                        <h4 class="font-bold text-slate-900">Clínica VetCuidado</h4>
+                        <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-location-dot mr-1"></i> A 2.8 km de você • Jd. Américas</p>
+                        <span class="text-[10px] bg-saude-100 text-saude-700 font-bold px-2 py-0.5 rounded mt-2 inline-block">Consultas e Vacinas</span>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-start space-x-4">
+                    <div class="text-2xl text-yellow-500 bg-yellow-50 p-3 rounded-xl"><i class="fa-solid fa-flask-vial"></i></div>
+                    <div>
+                        <h4 class="font-bold text-slate-900">Laboratório Diagnóstico Pet</h4>
+                        <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-location-dot mr-1"></i> A 4.1 km de você • Vila Nova</p>
+                        <span class="text-[10px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded mt-2 inline-block">Exames de Imagem e Sangue</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO DE PLANOS (CARDS DE PREÇO) -->
+        <section id="planos" class="py-20 bg-white border-t border-slate-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                    <h2 class="text-3xl font-extrabold text-slate-950 tracking-tight">Nossos Planos PetCode</h2>
+                    <p class="text-slate-600">Transparência total. Escolha o código de proteção perfeito para a saúde do seu pet.</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 items-stretch">
+                    <!-- Plano Essencial -->
+                    <div class="bg-white border border-slate-200 rounded-3xl p-8 flex flex-col justify-between shadow-sm relative hover:shadow-md transition-all">
+                        <div class="space-y-6">
+                            <div>
+                                <h3 id="display-name-Essencial" class="text-xl font-bold text-slate-900">PetCode Essencial</h3>
+                                <p class="text-sm text-slate-500 mt-1">O básico preventivo</p>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="text-slate-500 font-medium text-sm">R$</span>
+                                <span id="display-price-Essencial" class="text-4xl font-black text-slate-950 ml-1">49,90</span>
+                                <span class="text-slate-500 text-sm ml-1">/mês</span>
+                            </div>
+                            <ul id="lista-vantagens-Essencial" class="space-y-2 border-t border-slate-100 pt-6 text-[13px] text-slate-600">
+                                <!-- Injetado via JS -->
+                            </ul>
+                        </div>
+                        <button onclick="abrirCadastro('Essencial')" class="w-full mt-8 border border-slate-300 hover:border-slate-900 hover:bg-slate-900 hover:text-white text-slate-900 py-3 rounded-xl font-semibold transition-all">Selecionar Essencial</button>
+                    </div>
+
+                    <!-- Plano Plus -->
+                    <div class="bg-white border-2 border-saude-500 rounded-3xl p-8 flex flex-col justify-between shadow-xl relative transform md:-translate-y-4">
+                        <span class="bg-saude-500 text-white text-xs uppercase font-extrabold px-3 py-1 rounded-full absolute -top-3 left-1/2 transform -translate-x-1/2 tracking-wider">Mais Recomendado</span>
+                        <div class="space-y-6">
+                            <div>
+                                <h3 id="display-name-Plus" class="text-xl font-bold text-slate-900">PetCode Plus</h3>
+                                <p class="text-sm text-slate-500 mt-1">Cuidado e emergências</p>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="text-slate-500 font-medium text-sm">R$</span>
+                                <span id="display-price-Plus" class="text-4xl font-black text-slate-950 ml-1">99,90</span>
+                                <span class="text-slate-500 text-sm ml-1">/mês</span>
+                            </div>
+                            <ul id="lista-vantagens-Plus" class="space-y-2 border-t border-slate-100 pt-6 text-[13px] text-slate-600">
+                                <!-- Injetado via JS -->
+                            </ul>
+                        </div>
+                        <button onclick="abrirCadastro('Plus')" class="w-full mt-8 bg-saude-500 hover:bg-saude-600 text-white py-3 rounded-xl font-semibold shadow-lg shadow-saude-500/20 transition-all">Selecionar Plus</button>
+                    </div>
+
+                    <!-- Plano Total -->
+                    <div class="bg-white border border-slate-200 rounded-3xl p-8 flex flex-col justify-between shadow-sm relative hover:shadow-md transition-all">
+                        <div class="space-y-6">
+                            <div>
+                                <h3 id="display-name-Total" class="text-xl font-bold text-slate-900">PetCode Total</h3>
+                                <p class="text-sm text-slate-500 mt-1">Cirurgias e internação completa</p>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="text-slate-500 font-medium text-sm">R$</span>
+                                <span id="display-price-Total" class="text-4xl font-black text-slate-950 ml-1">189,90</span>
+                                <span class="text-slate-500 text-sm ml-1">/mês</span>
+                            </div>
+                            <ul id="lista-vantagens-Total" class="space-y-2 border-t border-slate-100 pt-6 text-[13px] text-slate-600">
+                                <!-- Injetado via JS -->
+                            </ul>
+                        </div>
+                        <button onclick="abrirCadastro('Total')" class="w-full mt-8 border border-slate-300 hover:border-slate-900 hover:bg-slate-900 hover:text-white text-slate-900 py-3 rounded-xl font-semibold transition-all">Selecionar Total</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTEÚDO: CURIOSIDADES E CUIDADOS (ID: dicas) -->
+        <section id="dicas" class="bg-slate-50 border-t border-slate-100 py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-3xl font-extrabold text-slate-950 tracking-tight">Universo PetCode 🧠</h2>
+                    <p class="text-slate-600 mt-2">Dicas essenciais de pós-operatório e segredos do mundo animal.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-12 items-start">
+                    <!-- Lado Esquerdo: Curiosidades -->
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                            <i class="fa-solid fa-lightbulb text-yellow-400 mr-3"></i> Você Sabia? (Passe o mouse)
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            
+                            <!-- CARD 1: Digital -->
+                            <div class="group h-40 perspective-[1000px] cursor-pointer">
+                                <div class="relative w-full h-full preserve-3d duration-700">
+                                    <div class="card-frente absolute w-full h-full bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                                        <i class="fa-solid fa-paw text-3xl text-saude-500 mb-2"></i>
+                                        <span class="font-bold text-slate-800 text-sm">Impressão Digital</span>
+                                    </div>
+                                    <div class="card-verso absolute w-full h-full bg-saude-500 text-white rounded-2xl p-4 flex items-center justify-center text-center text-xs font-medium shadow-lg">
+                                        O focinho de cada cão funciona como uma impressão digital única! Não existem dois iguais no mundo.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 2: Ronronar -->
+                            <div class="group h-40 perspective-[1000px] cursor-pointer">
+                                <div class="relative w-full h-full preserve-3d duration-700">
+                                    <div class="card-frente absolute w-full h-full bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                                        <i class="fa-solid fa-cat text-3xl text-azul-500 mb-2"></i>
+                                        <span class="font-bold text-slate-800 text-sm">Frequência Física</span>
+                                    </div>
+                                    <div class="card-verso absolute w-full h-full bg-azul-500 text-white rounded-2xl p-4 flex items-center justify-center text-center text-xs font-medium shadow-lg">
+                                        A frequência do ronronar dos felinos (20-140 Hz) ajuda a acelerar a recuperação de tecidos e ossos!
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 3: Visão dos Cães -->
+                            <div class="group h-40 perspective-[1000px] cursor-pointer">
+                                <div class="relative w-full h-full preserve-3d duration-700">
+                                    <div class="card-frente absolute w-full h-full bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                                        <i class="fa-solid fa-eye text-3xl text-amber-500 mb-2"></i>
+                                        <span class="font-bold text-slate-800 text-sm">Visão Colorida</span>
+                                    </div>
+                                    <div class="card-verso absolute w-full h-full bg-amber-500 text-white rounded-2xl p-4 flex items-center justify-center text-center text-xs font-medium shadow-lg">
+                                        Os cães não enxergam em preto e branco! Eles veem o mundo em tons de azul, amarelo, cinza e variações dessas cores.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 4: Ouvido dos Gatos -->
+                            <div class="group h-40 perspective-[1000px] cursor-pointer">
+                                <div class="relative w-full h-full preserve-3d duration-700">
+                                    <div class="card-frente absolute w-full h-full bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                                        <i class="fa-solid fa-ear-listen text-3xl text-emerald-500 mb-2"></i>
+                                        <span class="font-bold text-slate-800 text-sm">Super Audição</span>
+                                    </div>
+                                    <div class="card-verso absolute w-full h-full bg-emerald-500 text-white rounded-2xl p-4 flex items-center justify-center text-center text-xs font-medium shadow-lg">
+                                        Gatos conseguem girar as orelhas em até 180° de forma independente e detectam sons ultrassônicos inaudíveis para nós.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 5: Labrador -->
+                            <div class="group h-40 perspective-[1000px] cursor-pointer">
+                                <div class="relative w-full h-full preserve-3d duration-700">
+                                    <div class="card-frente absolute w-full h-full bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                                        <i class="fa-solid fa-water text-3xl text-sky-500 mb-2"></i>
+                                        <span class="font-bold text-slate-800 text-sm">Patas de Pato</span>
+                                    </div>
+                                    <div class="card-verso absolute w-full h-full bg-sky-500 text-white rounded-2xl p-4 flex items-center justify-center text-center text-xs font-medium shadow-lg">
+                                        Labradores possuem membranas entre os dedos, como patos! Isso os torna nadadores naturais excepcionais.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 6: Beagle -->
+                            <div class="group h-40 perspective-[1000px] cursor-pointer">
+                                <div class="relative w-full h-full preserve-3d duration-700">
+                                    <div class="card-frente absolute w-full h-full bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                                        <i class="fa-solid fa-magnifying-glass text-3xl text-orange-500 mb-2"></i>
+                                        <span class="font-bold text-slate-800 text-sm">Radar Olfativo</span>
+                                    </div>
+                                    <div class="card-verso absolute w-full h-full bg-orange-500 text-white rounded-2xl p-4 flex items-center justify-center text-center text-xs font-medium shadow-lg">
+                                        O nariz de um Beagle possui 220 milhões de receptores olfativos! Eles podem seguir rastros de dias atrás.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 8: Border Collie -->
+                            <div class="group h-40 perspective-[1000px] cursor-pointer">
+                                <div class="relative w-full h-full preserve-3d duration-700">
+                                    <div class="card-frente absolute w-full h-full bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                                        <i class="fa-solid fa-brain text-3xl text-rose-500 mb-2"></i>
+                                        <span class="font-bold text-slate-800 text-sm">Gênio Canino</span>
+                                    </div>
+                                    <div class="card-verso absolute w-full h-full bg-rose-500 text-white rounded-2xl p-4 flex items-center justify-center text-center text-xs font-medium shadow-lg">
+                                        O Border Collie é considerado a raça mais inteligente do mundo. Eles são capazes de aprender novos comandos com pouquíssimas repetições.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 7: Maine Coon -->
+                            <div class="group h-40 perspective-[1000px] cursor-pointer">
+                                <div class="relative w-full h-full preserve-3d duration-700">
+                                    <div class="card-frente absolute w-full h-full bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                                        <i class="fa-solid fa-cat text-3xl text-indigo-500 mb-2"></i>
+                                        <span class="font-bold text-slate-800 text-sm">Gigante Felino</span>
+                                    </div>
+                                    <div class="card-verso absolute w-full h-full bg-indigo-500 text-white rounded-2xl p-4 flex items-center justify-center text-center text-xs font-medium shadow-lg">
+                                        O Maine Coon é a maior raça de gatos domésticos. Alguns podem pesar até 11kg e ter o tamanho de um cachorro pequeno!
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Lado Direito: Accordion de Cuidados Pós-Cirúrgicos -->
+                    <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2 flex items-center"><i class="fa-solid fa-kit-medical text-red-500 mr-3"></i> Cuidados Pós-Cirúrgicos</h3>
+                        <p class="text-sm text-slate-500 mb-6">Dicas valiosas para a recuperação ideal após cirurgias ou castrações.</p>
+                        
+                        <div class="space-y-3">
+                            <div class="border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
+                                <button onclick="toggleAccordion(this)" class="w-full text-left px-5 py-4 font-bold text-slate-800 flex justify-between items-center focus:outline-none">
+                                    <span>Por que o colar elisabetano é inegociável?</span>
+                                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                                </button>
+                                <div class="accordion-content px-5 text-sm text-slate-600">
+                                    Impedir lamber ou morder os pontos é vital. A saliva do pet contém bactérias que provocam infecções, além do risco de abrir a sutura.
+                                </div>
+                            </div>
+
+                            <div class="border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
+                                <button onclick="toggleAccordion(this)" class="w-full text-left px-5 py-4 font-bold text-slate-800 flex justify-between items-center focus:outline-none">
+                                    <span>Como administrar a alimentação pós-anestesia?</span>
+                                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                                </button>
+                                <div class="accordion-content px-5 text-sm text-slate-600">
+                                    A medicação anestésica deixa o estômago sensível. Nas primeiras horas, ofereça apenas metade da porção usual de ração ou prefira alimentos úmidos mornos.
+                                </div>
+                            </div>
+
+                            <div class="border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
+                                <button onclick="toggleAccordion(this)" class="w-full text-left px-5 py-4 font-bold text-slate-800 flex justify-between items-center focus:outline-none">
+                                    <span>Por que castrar o seu Pet?</span>
+                                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                                </button>
+                                <div class="accordion-content px-5 text-sm text-slate-600">
+                                   A castração diminui o risco de várias doenças, como câncer de mama, útero e próstata, além de evitar infecções graves.
+                                </div>
+                            </div>
+
+                            <div class="border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
+                                <button onclick="toggleAccordion(this)" class="w-full text-left px-5 py-4 font-bold text-slate-800 flex justify-between items-center focus:outline-none">
+                                    <span>Repouso absoluto e restrição de movimentos</span>
+                                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                                </button>
+                                <div class="accordion-content px-5 text-sm text-slate-600">
+                                    Evite que o pet pule em móveis, suba escadas ou corra por pelo menos 10 a 14 dias. Movimentos bruscos podem causar o rompimento de pontos internos e hemorragias.
+                                </div>
+                            </div>
+
+                            <div class="border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
+                                <button onclick="toggleAccordion(this)" class="w-full text-left px-5 py-4 font-bold text-slate-800 flex justify-between items-center focus:outline-none">
+                                    <span>Como monitorar o local da incisão?</span>
+                                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                                </button>
+                                <div class="accordion-content px-5 text-sm text-slate-600">
+                                    Verifique a ferida cirúrgica diariamente. É normal um leve inchaço, mas vermelhidão intensa, calor excessivo na pele ou qualquer tipo de secreção com odor são sinais de alerta para procurar o veterinário.
+                                </div>
+                            </div>
+
+                            <div class="border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
+                                <button onclick="toggleAccordion(this)" class="w-full text-left px-5 py-4 font-bold text-slate-800 flex justify-between items-center focus:outline-none">
+                                    <span>A importância de seguir a receita à risca</span>
+                                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+                                </button>
+                                <div class="accordion-content px-5 text-sm text-slate-600">
+                                    Nunca interrompa o uso de antibióticos ou analgésicos antes do prazo, mesmo que o pet pareça recuperado. A dor pode surgir tardiamente e a interrupção de antibióticos gera resistência bacteriana perigosa.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- CARROSSEL DE DEPOIMENTOS -->
+        <section class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-2xl font-bold text-slate-950 mb-8">O que dizem os tutores do ecossistema PetCode</h3>
+            
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative max-w-2xl mx-auto">
+                <div id="depoimento-container" class="min-h-[120px] flex flex-col justify-center">
+                    <p id="depoimento-texto" class="text-lg italic text-slate-700">"O PetCode salvou o Thor quando ele engoliu um brinquedo de madrugada. O atendimento 24h na clínica parceira funcionou pelo QR Code em segundos! 5/5"</p>
+                    <h5 id="depoimento-autor" class="mt-4 font-bold text-slate-900 text-sm">Mariana S. • Tutora do Thor (Golden Retriever)</h5>
+                </div>
+                
+                <!-- Botões de Controle -->
+                <div class="flex justify-center space-x-4 mt-6">
+                    <button onclick="mudarDepoimento(-1)" class="w-10 h-10 border border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors text-slate-600"><i class="fa-solid fa-arrow-left text-xs"></i></button>
+                    <button onclick="mudarDepoimento(1)" class="w-10 h-10 border border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors text-slate-600"><i class="fa-solid fa-arrow-right text-xs"></i></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- VISÃO 2: FLUXO DE CADASTRO -->
+    <main id="view-cadastro" class="hidden py-16 max-w-xl mx-auto px-4 sm:px-6 mb-20 view-transition">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 space-y-8">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-100 pb-5">
+                <div id="ind-etapa-1" class="text-saude-600 flex items-center space-x-1"><span class="w-5 h-5 bg-saude-100 rounded-full flex items-center justify-center text-xs">1</span> <span>Tutor</span></div>
+                <div class="w-12 h-0.5 bg-slate-100"></div>
+                <div id="ind-etapa-2" class="flex items-center space-x-1"><span class="w-5 h-5 bg-slate-100 rounded-full flex items-center justify-center text-xs">2</span> <span>Pet</span></div>
+                <div class="w-12 h-0.5 bg-slate-100"></div>
+                <div id="ind-etapa-3" class="flex items-center space-x-1"><span class="w-5 h-5 bg-slate-100 rounded-full flex items-center justify-center text-xs">3</span> <span>Checkout</span></div>
+            </div>
+
+            <div class="bg-saude-50 border border-saude-100 p-4 rounded-xl flex justify-between items-center text-sm">
+                <div>
+                    <span class="text-slate-500">Plano Selecionado:</span>
+                    <h5 id="txt-plano-selecionado" class="font-bold text-slate-900">PetCode Plus</h5>
+                </div>
+                <button onclick="navegarPara('home')" class="text-xs text-saude-600 font-semibold underline hover:text-saude-700">Alterar</button>
+            </div>
+
+            <!-- Etapa 1 -->
+            <div id="etapa-1" class="block space-y-5">
+                <input type="text" class="w-full px-4 py-3 border border-slate-200 rounded-xl" placeholder="Nome Completo">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" class="w-full px-4 py-3 border border-slate-200 rounded-xl" placeholder="CPF">
+                    <input type="tel" class="w-full px-4 py-3 border border-slate-200 rounded-xl" placeholder="WhatsApp">
+                </div>
+                <input type="email" class="w-full px-4 py-3 border border-slate-200 rounded-xl" placeholder="E-mail">
+                <button onclick="proximaEtapa(2)" class="w-full bg-saude-500 text-white py-3.5 rounded-xl font-semibold">Continuar</button>
+            </div>
+
+            <!-- Etapa 2 -->
+            <div id="etapa-2" class="hidden space-y-5">
+                <input type="text" class="w-full px-4 py-3 border border-slate-200 rounded-xl" placeholder="Nome do Pet">
+                <input type="text" class="w-full px-4 py-3 border border-slate-200 rounded-xl" placeholder="Raça">
+                <div class="flex space-x-3">
+                    <button onclick="proximaEtapa(1)" class="w-1/3 border border-slate-200 py-3.5 rounded-xl text-sm font-bold">Voltar</button>
+                    <button onclick="proximaEtapa(3)" class="w-2/3 bg-saude-500 text-white py-3.5 rounded-xl font-semibold">Avançar</button>
+                </div>
+            </div>
+
+            <!-- Etapa 3 -->
+            <div id="etapa-3" class="hidden space-y-5">
+                <input type="text" class="w-full px-4 py-3 border border-slate-200 rounded-xl" placeholder="Número do Cartão">
+                <button onclick="finalizarContratacao()" class="w-full bg-slate-950 text-white py-3.5 rounded-xl font-semibold">Ativar Plano PetCode</button>
+            </div>
+
+            <!-- Sucesso -->
+            <div id="etapa-sucesso" class="hidden text-center py-6 space-y-4">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl mx-auto"><i class="fa-solid fa-check"></i></div>
+                <h3 class="text-xl font-black">Plano Ativo!</h3>
+                <button onclick="navegarPara('home')" class="bg-slate-100 text-slate-800 px-6 py-2.5 rounded-xl font-semibold text-sm">Voltar</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- VISÃO 4: GERENCIAMENTO DE CONTA -->
+    <main id="view-conta" class="hidden py-16 max-w-4xl mx-auto px-4 sm:px-6 mb-20 view-transition">
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Sidebar da Conta -->
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center">
+                    <div class="w-20 h-20 bg-saude-100 text-saude-600 rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-4">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <h3 id="conta-nome-tutor" class="font-bold text-slate-900 text-lg">Nome do Tutor</h3>
+                    <p id="conta-email-tutor" class="text-xs text-slate-500">email@exemplo.com</p>
+                </div>
+                <nav class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden" id="conta-nav-sidebar">
+                    <button onclick="toggleContaSecao('perfil')" id="btn-conta-perfil" class="w-full text-left px-6 py-4 text-sm font-bold text-saude-600 bg-saude-50 border-l-4 border-saude-500 transition-all">
+                        <i class="fa-solid fa-paw mr-2"></i> Meus Pets
+                    </button>
+                    <button onclick="toggleContaSecao('seguranca')" id="btn-conta-seguranca" class="w-full text-left px-6 py-4 text-sm font-medium text-slate-600 hover:bg-slate-50 border-l-4 border-transparent transition-all">
+                        <i class="fa-solid fa-lock mr-2"></i> Segurança
+                    </button>
+                    <button onclick="toggleContaSecao('pagamentos')" id="btn-conta-pagamentos" class="w-full text-left px-6 py-4 text-sm font-medium text-slate-600 hover:bg-slate-50 border-l-4 border-transparent transition-all">
+                        <i class="fa-solid fa-credit-card mr-2"></i> Pagamentos
+                    </button>
+                    <button onclick="toggleContaSecao('planos')" id="btn-conta-planos" class="w-full text-left px-6 py-4 text-sm font-medium text-slate-600 hover:bg-slate-50 border-l-4 border-transparent transition-all">
+                        <i class="fa-solid fa-file-contract mr-2"></i> Meu Plano
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Conteúdo Central -->
+            <div class="md:col-span-2 space-y-6">
+                <!-- Seção Meus Pets -->
+                <div id="conta-perfil" class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm block">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-slate-900">Meus Pets Cadastrados</h3>
+                        <button onclick="abrirModalAdicionarPet()" class="bg-saude-500 hover:bg-saude-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all">
+                            <i class="fa-solid fa-plus mr-1"></i> Adicionar Pet
+                        </button>
+                    </div>
+                    
+                    <div id="lista-pets-usuario" class="space-y-4">
+                        <!-- Pets do usuário renderizados via JS -->
+                    </div>
+                </div>
+
+                <!-- Seção Segurança (Placeholder) -->
+                <div id="conta-seguranca" class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hidden">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4">Configurações de Segurança</h3>
+                    <p class="text-slate-600">Aqui você poderá alterar sua senha, configurar autenticação de dois fatores e gerenciar dispositivos conectados.</p>
+                    <button class="mt-6 bg-slate-100 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium hover:bg-slate-200 transition-colors">Alterar Senha</button>
+                </div>
+
+                <!-- Seção Pagamentos (Placeholder) -->
+                <div id="conta-pagamentos" class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hidden">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4">Gerenciar Pagamentos</h3>
+                    <p class="text-slate-600">Adicione ou remova métodos de pagamento, visualize seu histórico de faturas e gerencie sua assinatura.</p>
+                    <button class="mt-6 bg-slate-100 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium hover:bg-slate-200 transition-colors">Adicionar Cartão</button>
+                </div>
+
+                <!-- Seção Planos -->
+                <div id="conta-planos" class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hidden">
+                    <h3 class="text-xl font-bold text-slate-900 mb-6">Meu Plano PetCode</h3>
+                    <div class="grid gap-4">
+                        <!-- Plano Essencial -->
+                        <div class="p-4 border border-slate-200 rounded-2xl flex justify-between items-center hover:border-saude-500 transition-all cursor-pointer group" onclick="escolherPlanoConta('Essencial')">
+                            <div>
+                                <h4 class="font-bold text-slate-900">PetCode Essencial</h4>
+                                <p class="text-xs text-slate-500">R$ 49,90/mês • Básico preventivo</p>
+                            </div>
+                            <div id="check-Essencial" class="w-6 h-6 border-2 border-slate-200 rounded-full flex items-center justify-center group-hover:border-saude-500">
+                                <i class="fa-solid fa-check text-[10px] text-white"></i>
+                            </div>
+                        </div>
+                        <!-- Plano Plus -->
+                        <div class="p-4 border border-slate-200 rounded-2xl flex justify-between items-center hover:border-saude-500 transition-all cursor-pointer group" onclick="escolherPlanoConta('Plus')">
+                            <div>
+                                <h4 class="font-bold text-slate-900">PetCode Plus</h4>
+                                <p class="text-xs text-slate-500">R$ 99,90/mês • Cuidado e emergências</p>
+                            </div>
+                            <div id="check-Plus" class="w-6 h-6 border-2 border-slate-200 rounded-full flex items-center justify-center group-hover:border-saude-500">
+                                <i class="fa-solid fa-check text-[10px] text-white"></i>
+                            </div>
+                        </div>
+                        <!-- Plano Total -->
+                        <div class="p-4 border border-slate-200 rounded-2xl flex justify-between items-center hover:border-saude-500 transition-all cursor-pointer group" onclick="escolherPlanoConta('Total')">
+                            <div>
+                                <h4 class="font-bold text-slate-900">PetCode Total</h4>
+                                <p class="text-xs text-slate-500">R$ 189,90/mês • Cobertura completa</p>
+                            </div>
+                            <div id="check-Total" class="w-6 h-6 border-2 border-slate-200 rounded-full flex items-center justify-center group-hover:border-saude-500">
+                                <i class="fa-solid fa-check text-[10px] text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 p-4 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-700">
+                        <i class="fa-solid fa-circle-info mr-1"></i> A alteração de plano entra em vigor no próximo ciclo de faturamento.
+                    </div>
+                </div>
+
+                <!-- Modal para Adicionar Pet -->
+                <div id="modal-adicionar-pet" class="hidden fixed inset-0 bg-black/50 z-[999] flex items-center justify-center px-4">
+                    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+                        <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                            <div>
+                                <h2 id="modal-pet-titulo" class="text-2xl font-black text-slate-900">Adicionar Novo Pet</h2>
+                                <p class="text-sm text-slate-500">Preencha os dados do seu novo companheiro</p>
+                            </div>
+                            <button onclick="fecharModalAdicionarPet()" class="text-slate-400 hover:text-slate-700 text-xl">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 space-y-5">
+                            <input type="text" id="add-pet-nome" placeholder="Nome do Pet" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50">
+                            <select id="add-pet-especie" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 text-slate-500">
+                                <option value="" disabled selected>Espécie (Obrigatório)</option>
+                                <option value="Cachorro">Cachorro</option>
+                                <option value="Gato">Gato</option>
+                                <option value="Coelho">Coelho</option>
+                                <option value="Hamster">Hamster</option>
+                                <option value="Pássaro">Pássaro</option>
+                                <option value="Porquinho da Índia">Porquinho da Índia</option>
+                                <option value="Tartaruga">Tartaruga</option>
+                            </select>
+                            <select id="add-pet-porte" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 text-slate-500">
+                                <option value="" disabled selected>Porte (Obrigatório)</option>
+                                <option value="Pequeno">Pequeno (até 10kg)</option>
+                                <option value="Médio">Médio (11-25kg)</option>
+                                <option value="Grande">Grande (+25kg)</option>
+                            </select>
+                            <input type="text" id="add-pet-raca" placeholder="Raça (Opcional)" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50">
+                            <button id="btn-salvar-pet" onclick="salvarNovoPet()" class="w-full bg-saude-500 hover:bg-saude-600 text-white font-bold py-3 rounded-xl">
+                                Adicionar Pet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <button onclick="navegarPara('home')" class="text-slate-400 font-bold hover:text-slate-600 transition-colors">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Voltar para Navegação
+            </button>
+        </div>
+    </main>
+
+    <!-- VISÃO 3: PAINEL DO ADMINISTRADOR -->
+    <main id="view-admin" class="hidden py-16 max-w-6xl mx-auto px-4 sm:px-6 mb-20 view-transition">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Painel de Gestão PetCode</h2>
+                    <p class="text-sm text-slate-500">Monitoramento de clientes e planos ativos</p>
+                </div>
+                <div class="text-right">
+                    <span id="stats-total-clientes" class="bg-saude-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-md">Total: 0 Clientes</span>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 text-slate-400 text-xs uppercase font-bold tracking-wider">
+                        <tr>
+                            <th class="px-8 py-4">Cliente</th>
+                            <th class="px-8 py-4">Pet</th>
+                            <th class="px-8 py-4">Plano</th>
+                            <th class="px-8 py-4 text-center">Pagamento</th>
+                            <th class="px-8 py-4 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-clientes-admin" class="divide-y divide-slate-100 text-sm">
+                        <!-- Injetado via JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="admin-vazio" class="hidden py-20 text-center">
+                <i class="fa-solid fa-users-slash text-slate-200 text-6xl mb-4"></i>
+                <p class="text-slate-400 font-medium">Nenhum cliente cadastrado no sistema ainda.</p>
+            </div>
+        </div>
+
+        <!-- GESTÃO DE PLANOS (EXCLUSIVO ADMIN) -->
+        <div class="mt-12 bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            <div class="p-8 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Gestão de Ofertas e Planos</h2>
+                    <p class="text-sm text-slate-500">Configure preços, nomes e coberturas globais</p>
+                </div>
+            </div>
+            <div id="admin-planos-grid" class="p-8 grid lg:grid-cols-3 gap-8">
+                <!-- Injetado via JS: Forms de cada plano -->
+            </div>
+            <div class="p-8 bg-slate-50 border-t border-slate-100 text-right">
+                <button onclick="salvarConfiguracaoPlanos()" class="bg-saude-500 hover:bg-saude-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">
+                    Salvar Alterações de Planos
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <button onclick="navegarPara('home')" class="text-saude-600 font-bold hover:underline">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Voltar para a Home
+            </button>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-500 py-8 text-center text-sm mt-20">
+        <p>&copy; 2026 PetCode Ecosystem. Saúde animal sem burocracia.</p>
+    </footer>
+
+    <!-- LOGICAS EM JS -->
+    <script>
+        function navegarPara(view) {
+            document.getElementById('view-home').classList.toggle('hidden', view !== 'home');
+            document.getElementById('view-cadastro').classList.toggle('hidden', view !== 'cadastro');
+            document.getElementById('view-admin').classList.toggle('hidden', view !== 'admin');
+            document.getElementById('view-conta').classList.toggle('hidden', view !== 'conta');
+            document.getElementById('modal-adicionar-pet').classList.add('hidden'); // Fecha modal de adicionar pet
+            
+            // Fecha dropdowns ao navegar
+            document.getElementById('dropdown-usuario').classList.add('hidden');
+            document.getElementById('menu-mobile').classList.add('hidden');
+            document.getElementById('menu-mobile').classList.remove('flex');
+
+            if (view === 'admin') { renderizarAdminDashboard(); renderizarGestaoPlanos(); }
+            if (view === 'conta') renderizarPerfilUsuario();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function toggleContaSecao(secao) {
+            const secoes = ['perfil', 'seguranca', 'pagamentos', 'planos'];
+            secoes.forEach(s => {
+                document.getElementById(`conta-${s}`).classList.toggle('hidden', s !== secao);
+                document.getElementById(`btn-conta-${s}`).classList.remove('text-saude-600', 'bg-saude-50', 'border-l-4', 'border-saude-500');
+                document.getElementById(`btn-conta-${s}`).classList.add('text-slate-600', 'hover:bg-slate-50', 'border-l-4', 'border-transparent');
+            });
+            document.getElementById(`conta-${secao}`).classList.remove('hidden');
+            document.getElementById(`btn-conta-${secao}`).classList.add('text-saude-600', 'bg-saude-50', 'border-l-4', 'border-saude-500');
+            document.getElementById(`btn-conta-${secao}`).classList.remove('text-slate-600', 'hover:bg-slate-50', 'border-l-4', 'border-transparent');
+
+        }
+
+        function toggleMenuMobile() {
+            const menu = document.getElementById('menu-mobile');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+        }
+
+        function abrirCadastro(plano) {
+            document.getElementById('txt-plano-selecionado').innerText = 'PetCode ' + plano;
+            navegarPara('cadastro');
+            proximaEtapa(1);
+        }
+
+        function proximaEtapa(e) {
+            for(let i=1; i<=3; i++) {
+                document.getElementById('etapa-'+i).classList.add('hidden');
+                document.getElementById('ind-etapa-'+i).classList.remove('text-saude-600');
+            }
+            document.getElementById('etapa-sucesso').classList.add('hidden');
+            document.getElementById('etapa-'+e).classList.remove('hidden');
+            document.getElementById('ind-etapa-'+e).classList.add('text-saude-600');
+        }
+
+        function finalizarContratacao() {
+            const planoNome = document.getElementById('txt-plano-selecionado').innerText.replace('PetCode ', '');
+            
+            // Atualiza status do usuário logado
+            let user = JSON.parse(localStorage.getItem('petcode_usuario_logado'));
+            if(user) {
+                user.plano = planoNome;
+                user.pagamento = 'Pago';
+                localStorage.setItem('petcode_usuario_logado', JSON.stringify(user));
+                
+                // Atualiza na base geral de usuários
+                let usuarios = JSON.parse(localStorage.getItem('petcode_usuarios')) || [];
+                const idx = usuarios.findIndex(u => u.email === user.email);
+                if(idx !== -1) {
+                    usuarios[idx] = user;
+                    localStorage.setItem('petcode_usuarios', JSON.stringify(usuarios));
+                }
+            }
+            document.getElementById('etapa-3').classList.add('hidden');
+            document.getElementById('etapa-sucesso').classList.remove('hidden');
+        }
+
+        function toggleAccordion(btn) {
+            const content = btn.nextElementSibling;
+            content.classList.toggle('open');
+            btn.querySelector('i').classList.toggle('rotate-180');
+        }
+
+        // Lógica do Quiz
+        function calcularQuiz() {
+            const especie = document.getElementById('q-especie').value;
+            const porte = document.getElementById('q-porte').value;
+            const idade = document.getElementById('q-idade').value;
+            const estilo = document.getElementById('q-estilo').value;
+            let plano = "Plus";
+            let desc = "Equilíbrio perfeito para consultas de rotina, exames e acidentes inesperados.";
+
+            if (idade === 'idoso' || estilo === 'aventureiro' || (especie === 'cao' && porte === 'grande')) {
+                plano = "Total";
+                desc = "Seu pet precisa de proteção avançada devido ao perfil ativo, porte ou à idade, cobrindo cirurgias e internamentos.";
+            } else if (idade === 'filhote') {
+                plano = "Essencial";
+                desc = "Excelente para dar início ao ciclo de vacinas importadas e acompanhamento pediátrico inicial.";
+            }
+
+            document.getElementById('quiz-btn-container').classList.add('hidden');
+            document.getElementById('res-plano').innerText = "Plano " + plano;
+            document.getElementById('res-motivo').innerText = desc;
+            document.getElementById('quiz-resultado').classList.remove('hidden');
+        }
+
+        // Lógica da Calculadora de Idade Humana
+        function calcularIdadeHumana() {
+            const especie = document.getElementById('calc-especie').value;
+            const porte = document.getElementById('calc-porte').value;
+            const idadeReal = parseInt(document.getElementById('calc-idade').value) || 1;
+            let idadeHumana = 0;
+            let frase = "";
+
+            if (especie === 'cao') {
+                let fator = (porte === 'pequeno') ? 4 : (porte === 'medio') ? 5 : 7;
+                if (idadeReal === 1) idadeHumana = 15;
+                else if (idadeReal === 2) idadeHumana = 24;
+                else idadeHumana = 24 + ((idadeReal - 2) * fator);
+            } else if (especie === 'gato') {
+                if (idadeReal === 1) idadeHumana = 15;
+                else if (idadeReal === 2) idadeHumana = 24;
+                else idadeHumana = 24 + ((idadeReal - 2) * 4);
+            } else if (especie === 'coelho') {
+                idadeHumana = idadeReal * 8; // Estimativa média coelho
+            } else if (especie === 'hamster') {
+                idadeHumana = idadeReal * 40; // Hamsters vivem pouco
+            } else if (especie === 'passaro') {
+                idadeHumana = idadeReal * 5; // Pássaros (psitacídeos) vivem muito
+            } else if (especie === 'porquinho') {
+                idadeHumana = idadeReal * 10;
+            } else if (especie === 'tartaruga') {
+                idadeHumana = idadeReal * 2; // Tartarugas envelhecem muito devagar
+            }
+
+            if(idadeHumana < 20) frase = "Seu pet é um adolescente cheio de energia!";
+            else if(idadeHumana < 45) frase = "Seu pet está no auge da vida adulta e maturidade!";
+            else frase = "Um pet sábio e sênior que merece cuidados redobrados.";
+
+            document.getElementById('calc-resultado-num').innerText = idadeHumana;
+            document.getElementById('calc-resultado-texto').innerText = "Anos humanos. " + frase;
+        }
+
+        function togglePorteVisibility() {
+            const especie = document.getElementById('calc-especie').value;
+            const wrapper = document.getElementById('wrapper-porte');
+            wrapper.style.opacity = (especie === 'cao') ? "1" : "0.3";
+            wrapper.style.pointerEvents = (especie === 'cao') ? "auto" : "none";
+        }
+
+        function togglePorteVisibilityQuiz() {
+            const especie = document.getElementById('q-especie').value;
+            const wrapper = document.getElementById('wrapper-q-porte');
+            wrapper.style.opacity = (especie === 'cao') ? "1" : "0.3";
+            wrapper.style.pointerEvents = (especie === 'cao') ? "auto" : "none";
+        }
+
+        // Lógica de Simulação da Rede Credenciada
+        function simularBuscaRede() {
+            const cep = document.getElementById('cep-input').value;
+            if(!cep) return alert("Por favor, digite um CEP para simular.");
+
+            document.getElementById('rede-resultados').classList.add('hidden');
+            document.getElementById('rede-loader').classList.remove('hidden');
+
+            setTimeout(() => {
+                document.getElementById('rede-loader').classList.add('hidden');
+                document.getElementById('rede-resultados').classList.remove('hidden');
+                document.getElementById('rede-resultados').classList.add('grid');
+            }, 1200);
+        }
+
+        // Lógica do Carrossel de Depoimentos
+        const depoimentos = [
+            { texto: '"O PetCode salvou o Thor quando ele engoliu um brinquedo de madrugada. O atendimento 24h na clínica parceira funcionou pelo QR Code em segundos!5/5"', autor: "Mariana S. • Tutora do Thor (Golden Retriever)" },
+            { texto: '"Minha gatinha Luna precisou fazer exames complexos de imagem. Não paguei nada além da mensalidade do plano Plus. Melhor investimento. 5/5"', autor: "Carlos D. • Tutor da Luna (Siamês)" },
+            { texto: '"O que eu mais gosto é do aplicativo e da facilidade do site. Sem burocracia ou guias de papel para autorizar consultas. Tudo muito moderno. 4,5/5"', autor: "Aline M. • Tutora do Fred (Vira-lata)" }
+        ];
+        let depoimentoAtual = 0;
+
+        function mudarDepoimento(direcao) {
+            depoimentoAtual += direcao;
+            if (depoimentoAtual < 0) depoimentoAtual = depoimentos.length - 1;
+            if (depoimentoAtual >= depoimentos.length) depoimentoAtual = 0;
+
+            document.getElementById('depoimento-texto').innerText = depoimentos[depoimentoAtual].texto;
+            document.getElementById('depoimento-autor').innerText = depoimentos[depoimentoAtual].autor;
+        }
+let usuarioAtual = null;
+
+function abrirModalLogin() {
+document.getElementById('modal-auth').classList.remove('hidden');
+}
+
+function fecharModalLogin() {
+document.getElementById('modal-auth').classList.add('hidden');
+}
+
+function mostrarCadastro() {
+document.getElementById('login-box').classList.add('hidden');
+document.getElementById('cadastro-box').classList.remove('hidden');
+}
+
+function mostrarLogin() {
+document.getElementById('cadastro-box').classList.add('hidden');
+document.getElementById('login-box').classList.remove('hidden');
+}
+
+function criarConta() {
+
+const nome = document.getElementById('cadastro-nome').value;
+const email = document.getElementById('cadastro-email').value;
+const senha = document.getElementById('cadastro-senha').value;
+
+const petNome = document.getElementById('pet-nome').value;
+const petEspecie = document.getElementById('pet-especie').value; // Usado para o primeiro pet
+const petPorte = document.getElementById('pet-porte').value; // Usado para o primeiro pet
+const petRaca = document.getElementById('pet-raca').value;
+
+if (!nome || !email || !senha || !petEspecie || !petPorte) {
+alert('Preencha os campos obrigatórios (incluindo a espécie e o porte do pet).');
+return;
+}
+
+const usuarios = JSON.parse(localStorage.getItem('petcode_usuarios')) || [];
+
+const existe = usuarios.find(u => u.email === email);
+
+if (existe) {
+alert('E-mail já cadastrado.');
+return;
+}
+
+const novoUsuario = {
+nome,
+email,
+senha,
+pets: [{ // Agora é um array de pets
+nome: petNome,
+especie: petEspecie,
+porte: petPorte,
+raca: petRaca || 'SRD'
+}]
+};
+
+usuarios.push(novoUsuario);
+
+localStorage.setItem('petcode_usuarios', JSON.stringify(usuarios));
+
+localStorage.setItem('petcode_usuario_logado',
+JSON.stringify(novoUsuario));
+
+usuarioAtual = novoUsuario;
+
+atualizarInterfaceUsuario();
+
+fecharModalLogin();
+
+alert('Conta criada com sucesso!');
+}
+
+function realizarLogin() {
+
+const email = document.getElementById('login-email').value;
+const senha = document.getElementById('login-senha').value;
+
+// LOGIN ESPECIAL DE ADMIN
+if (email === 'admin@petcode.com' && senha === 'admin123') {
+    const adminUser = { nome: 'Administrador', email: 'admin@petcode.com', role: 'admin' };
+    localStorage.setItem('petcode_usuario_logado', JSON.stringify(adminUser));
+    usuarioAtual = adminUser;
+    atualizarInterfaceUsuario();
+    fecharModalLogin();
+    alert('Acesso Administrativo Concedido!');
+    return;
+}
+
+const usuarios = JSON.parse(localStorage.getItem('petcode_usuarios')) || [];
+
+const usuario = usuarios.find(u =>
+u.email === email && u.senha === senha
+);
+
+if (!usuario) {
+alert('E-mail ou senha incorretos.');
+return;
+}
+
+usuarioAtual = usuario;
+
+localStorage.setItem('petcode_usuario_logado',
+JSON.stringify(usuario));
+
+atualizarInterfaceUsuario();
+
+fecharModalLogin();
+
+alert('Login realizado com sucesso!');
+}
+
+function atualizarInterfaceUsuario() {
+    const usuario = JSON.parse(localStorage.getItem('petcode_usuario_logado'));
+    const nomeElement = document.getElementById('nome-usuario');
+    const menuLogado = document.getElementById('menu-logado');
+    const menuDeslogado = document.getElementById('menu-deslogado');
+    const btnAdmin = document.getElementById('btn-admin-panel');
+    const btnAssinar = document.getElementById('btn-assinar');
+    const mobileAuth = document.getElementById('mobile-auth-section');
+
+    if (usuario) {
+        nomeElement.innerText = usuario.nome;
+        menuLogado.classList.remove('hidden');
+        menuDeslogado.classList.add('hidden');
+
+        mobileAuth.innerHTML = `
+            <div class="bg-slate-50 p-4 rounded-2xl mb-2">
+                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Logado como</p>
+                <p class="font-bold text-slate-900">${usuario.nome}</p>
+            </div>
+            <button onclick="toggleMenuMobile(); navegarPara('conta')" class="w-full text-left py-3 text-saude-600 font-bold">Minha Conta</button>
+            <button onclick="toggleMenuMobile(); logoutUsuario()" class="w-full text-left py-3 text-red-500 font-bold">Sair</button>
+        `;
+
+        if (usuario.role === 'admin') {
+            btnAdmin.classList.remove('hidden');
+            btnAssinar.classList.add('hidden');
+        } else {
+            btnAdmin.classList.add('hidden');
+            btnAssinar.classList.remove('hidden');
+        }
+    } else {
+        nomeElement.innerText = "Conta";
+        menuLogado.classList.add('hidden');
+        menuDeslogado.classList.remove('hidden');
+
+        mobileAuth.innerHTML = `
+            <button onclick="toggleMenuMobile(); abrirModalLogin()" class="w-full bg-saude-500 text-white font-bold py-3.5 rounded-2xl shadow-lg">
+                Entrar / Criar Conta
+            </button>
+        `;
+
+        btnAdmin.classList.add('hidden');
+    }
+}
+
+function renderizarAdminDashboard() {
+    const usuarios = JSON.parse(localStorage.getItem('petcode_usuarios')) || [];
+    const tabela = document.getElementById('tabela-clientes-admin');
+    const listaVazia = document.getElementById('admin-vazio');
+    
+    document.getElementById('stats-total-clientes').innerText = `Total: ${usuarios.length} Clientes`;
+    
+    if (usuarios.length === 0) {
+        tabela.innerHTML = '';
+        listaVazia.classList.remove('hidden');
+        return;
+    }
+    
+    listaVazia.classList.add('hidden');
+    tabela.innerHTML = usuarios.map((user, index) => {
+        // Obtém todos os pets (suporta formato novo de array e legado de objeto único)
+        const pets = user.pets || (user.pet ? [user.pet] : []);
+        const petsHtml = pets.map(pet => `
+            <div class="flex items-center mb-2 last:mb-0">
+                <span class="w-6 h-6 bg-saude-100 rounded-lg flex items-center justify-center text-[10px] mr-2">🐾</span>
+                <div>
+                    <div class="font-semibold text-slate-700 text-xs">${pet.nome} (${pet.especie})</div>
+                    <div class="text-[9px] text-slate-400">${pet.raca || 'SRD'} • ${pet.porte || '-'}</div>
+                </div>
+            </div>
+        `).join('');
+
+        return `
+        <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-8 py-5">
+                <div class="font-bold text-slate-900">${user.nome}</div>
+                <div class="text-[10px] text-slate-400 uppercase tracking-tighter">${user.email}</div>
+            </td>
+            <td class="px-8 py-5">
+                ${petsHtml || '<span class="text-xs text-slate-400 italic">Nenhum pet</span>'}
+            </td>
+            <td class="px-8 py-5 text-slate-600 font-medium text-xs">${user.plano || 'Sem Plano'}</td>
+            <td class="px-8 py-5 text-center">
+                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase ${user.pagamento === 'Pago' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
+                    ${user.pagamento || 'Pendente'}
+                </span>
+            </td>
+            <td class="px-8 py-5 text-center">
+                <button onclick="excluirUsuario(${index})" class="text-red-400 hover:text-red-600 transition-transform hover:scale-110" title="Excluir Usuário">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </td>
+        </tr>
+    `}).join('');
+}
+
+function excluirUsuario(index) {
+    if (!confirm('Tem certeza que deseja excluir permanentemente este cadastro? Esta ação não pode ser desfeita.')) return;
+
+    let usuarios = JSON.parse(localStorage.getItem('petcode_usuarios')) || [];
+    usuarios.splice(index, 1); // Remove o usuário pelo índice
+    
+    localStorage.setItem('petcode_usuarios', JSON.stringify(usuarios));
+    
+    renderizarAdminDashboard(); // Atualiza a tabela na tela
+}
+
+function toggleMenuUsuario() {
+    const dropdown = document.getElementById('dropdown-usuario');
+    dropdown.classList.toggle('hidden');
+}
+
+function renderizarPerfilUsuario() {
+    const user = JSON.parse(localStorage.getItem('petcode_usuario_logado'));
+    if (!user) return;
+    document.getElementById('menu-mobile').classList.add('hidden');
+    document.getElementById('menu-mobile').classList.remove('flex');
+    document.getElementById('conta-nome-tutor').innerText = user.nome;
+    document.getElementById('conta-email-tutor').innerText = user.email;
+
+    const listaPets = document.getElementById('lista-pets-usuario');
+    listaPets.innerHTML = '';
+
+    // Compatibilidade com cadastros antigos que tinham apenas 'pet' em vez de 'pets'
+    const petsParaExibir = user.pets || (user.pet ? [user.pet] : []);
+
+    // Renderizar múltiplos pets (se houver)
+    if (petsParaExibir.length > 0) {
+        listaPets.innerHTML = petsParaExibir.map((pet, index) => `
+            <div class="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:border-saude-200 transition-colors">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-saude-100 text-saude-600 rounded-full flex items-center justify-center text-xl shadow-inner">🐾</div>
+                    <div>
+                        <h4 class="font-bold text-slate-900">${pet.nome}</h4>
+                        <p class="text-xs text-slate-500">${pet.especie} • ${pet.porte} • ${pet.raca}</p>
+                    </div>
+                </div>
+                <button onclick="abrirModalEditarPet(${index})" class="text-slate-400 hover:text-saude-600 p-2 transition-colors" title="Editar Pet">
+                    <i class="fa-solid fa-pen-to-square text-lg"></i>
+                </button>
+            </div>
+        `).join('');
+    } else {
+        listaPets.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fa-solid fa-paw text-3xl mb-3 opacity-20"></i><p>Nenhum pet cadastrado. Adicione um!</p></div>';
+    }
+    toggleContaSecao('perfil'); // Garante que a seção de perfil esteja visível
+}
+
+let petEditIndex = null;
+
+function abrirModalAdicionarPet() {
+    petEditIndex = null;
+    document.getElementById('modal-pet-titulo').innerText = "Adicionar Novo Pet";
+    document.getElementById('btn-salvar-pet').innerText = "Adicionar Pet";
+    document.getElementById('add-pet-nome').value = '';
+    document.getElementById('add-pet-especie').value = '';
+    document.getElementById('add-pet-raca').value = '';
+    document.getElementById('modal-adicionar-pet').classList.remove('hidden');
+}
+
+function abrirModalEditarPet(index) {
+    petEditIndex = index;
+    const user = JSON.parse(localStorage.getItem('petcode_usuario_logado'));
+    const pets = user.pets || (user.pet ? [user.pet] : []);
+    const pet = pets[index];
+
+    document.getElementById('modal-pet-titulo').innerText = "Editar Cadastro do Pet";
+    document.getElementById('btn-salvar-pet').innerText = "Salvar Alterações";
+    document.getElementById('add-pet-nome').value = pet.nome;
+    document.getElementById('add-pet-especie').value = pet.especie;
+    document.getElementById('add-pet-porte').value = pet.porte;
+    document.getElementById('add-pet-raca').value = pet.raca === 'SRD' ? '' : pet.raca;
+
+    document.getElementById('modal-adicionar-pet').classList.remove('hidden');
+}
+
+function fecharModalAdicionarPet() {
+    document.getElementById('modal-adicionar-pet').classList.add('hidden');
+}
+
+function salvarNovoPet() {
+    const petNome = document.getElementById('add-pet-nome').value;
+    const petEspecie = document.getElementById('add-pet-especie').value;
+    const petPorte = document.getElementById('add-pet-porte').value;
+    const petRaca = document.getElementById('add-pet-raca').value;
+
+    if (!petNome || !petEspecie || !petPorte) {
+        alert('Por favor, preencha o nome, espécie e porte do pet.');
+        return;
+    }
+
+    let usuario = JSON.parse(localStorage.getItem('petcode_usuario_logado'));
+    if (!usuario) return;
+
+    if (!usuario.pets) {
+        usuario.pets = usuario.pet ? [usuario.pet] : [];
+    }
+
+    const petData = { nome: petNome, especie: petEspecie, porte: petPorte, raca: petRaca || 'SRD' };
+
+    if (petEditIndex !== null) {
+        usuario.pets[petEditIndex] = petData;
+    } else {
+        usuario.pets.push(petData);
+    }
+
+    localStorage.setItem('petcode_usuario_logado', JSON.stringify(usuario));
+    
+    let todosUsuarios = JSON.parse(localStorage.getItem('petcode_usuarios')) || [];
+    const userIndex = todosUsuarios.findIndex(u => u.email === usuario.email);
+    if (userIndex !== -1) {
+        todosUsuarios[userIndex] = usuario;
+        localStorage.setItem('petcode_usuarios', JSON.stringify(todosUsuarios));
+    }
+
+    fecharModalAdicionarPet();
+    renderizarPerfilUsuario();
+    alert(petEditIndex !== null ? 'Cadastro atualizado com sucesso!' : 'Novo pet adicionado com sucesso!');
+}
+
+function marcarPlanoAtivo() {
+    const user = JSON.parse(localStorage.getItem('petcode_usuario_logado'));
+    if (!user) return;
+    
+    ['Essencial', 'Plus', 'Total'].forEach(p => {
+        const check = document.getElementById(`check-${p}`);
+        const container = check.parentElement;
+        if (user.plano === p) {
+            check.classList.add('bg-saude-500', 'border-saude-500');
+            container.classList.add('border-saude-500', 'bg-saude-50/50');
+        } else {
+            check.classList.remove('bg-saude-500', 'border-saude-500');
+            container.classList.remove('border-saude-500', 'bg-saude-50/50');
+        }
+    });
+}
+
+function escolherPlanoConta(planoNome) {
+    let user = JSON.parse(localStorage.getItem('petcode_usuario_logado'));
+    if (!user || user.plano === planoNome) return;
+    
+    if (confirm(`Deseja alterar seu plano para PetCode ${planoNome}?`)) {
+        user.plano = planoNome;
+        localStorage.setItem('petcode_usuario_logado', JSON.stringify(user));
+        let todosUsuarios = JSON.parse(localStorage.getItem('petcode_usuarios')) || [];
+        const idx = todosUsuarios.findIndex(u => u.email === user.email);
+        if (idx !== -1) { todosUsuarios[idx].plano = planoNome; localStorage.setItem('petcode_usuarios', JSON.stringify(todosUsuarios)); }
+        marcarPlanoAtivo();
+        alert('Plano atualizado com sucesso!');
+    }
+}
+
+function logoutUsuario() {
+    localStorage.removeItem('petcode_usuario_logado');
+    document.getElementById('dropdown-usuario').classList.add('hidden');
+    atualizarInterfaceUsuario();
+    navegarPara('home');
+    alert('Logout realizado.');
+}
+
+const ITENS_COBERTURA = [
+    "Consultas Clínicas", "Vacinas Anuais", "Exames de Sangue", "Coleira Rastreadora", 
+    "Descontos Farmácia", "Emergência 24h", "Exames de Imagem", "Limpeza de Tártaro", 
+    "Cirurgias Complexas", "Internação Ilimitada", "Especialistas", "Ração Premium"
+];
+
+function inicializarPlanos() {
+    if (!localStorage.getItem('petcode_config_planos')) {
+        const planosIniciais = {
+            Essencial: { nome: 'PetCode Essencial', preco: '49,90', cobertura: [0, 1, 2, 3, 4] },
+            Plus: { nome: 'PetCode Plus', preco: '99,90', cobertura: [0, 1, 2, 3, 4, 5, 6, 7] },
+            Total: { nome: 'PetCode Total', preco: '189,90', cobertura: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] }
+        };
+        localStorage.setItem('petcode_config_planos', JSON.stringify(planosIniciais));
+    }
+    atualizarUIPlanos();
+}
+
+function atualizarUIPlanos() {
+    const planos = JSON.parse(localStorage.getItem('petcode_config_planos'));
+    Object.keys(planos).forEach(id => {
+        const p = planos[id];
+        if(document.getElementById(`display-name-${id}`)) document.getElementById(`display-name-${id}`).innerText = p.nome;
+        if(document.getElementById(`display-price-${id}`)) document.getElementById(`display-price-${id}`).innerText = p.preco;
+        
+        const lista = document.getElementById(`lista-vantagens-${id}`);
+        if(lista) {
+            lista.innerHTML = ITENS_COBERTURA.map((texto, index) => {
+                const estaIncluso = p.cobertura.includes(index);
+                return `
+                    <li class="flex items-center ${estaIncluso ? '' : 'text-slate-400'}">
+                        <i class="fa-solid ${estaIncluso ? 'fa-check text-saude-500' : 'fa-xmark text-slate-300'} mr-2.5 w-4 text-center"></i> 
+                        ${texto}
+                    </li>
+                `;
+            }).join('');
+        }
+    });
+}
+
+function renderizarGestaoPlanos() {
+    const planos = JSON.parse(localStorage.getItem('petcode_config_planos'));
+    const container = document.getElementById('admin-planos-grid');
+    
+    container.innerHTML = Object.keys(planos).map(id => {
+        const p = planos[id];
+        return `
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
+                <h4 class="font-black text-slate-900 text-lg border-b border-slate-200 pb-2">${id}</h4>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Nome Comercial</label>
+                    <input type="text" id="admin-name-${id}" value="${p.nome}" class="w-full border border-slate-200 rounded-lg p-2 text-sm">
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Preço Mensal (R$)</label>
+                    <input type="text" id="admin-price-${id}" value="${p.preco}" class="w-full border border-slate-200 rounded-lg p-2 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Coberturas do Plano</label>
+                    <div class="space-y-1 max-h-48 overflow-y-auto pr-2 bg-white border border-slate-100 rounded-lg p-2">
+                        ${ITENS_COBERTURA.map((item, index) => `
+                            <label class="flex items-center space-x-2 text-xs cursor-pointer hover:bg-slate-50 p-1 rounded">
+                                <input type="checkbox" class="admin-check-${id} rounded border-slate-300 text-saude-500 focus:ring-saude-500" 
+                                       value="${index}" ${p.cobertura.includes(index) ? 'checked' : ''}>
+                                <span>${item}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function salvarConfiguracaoPlanos() {
+    const planos = JSON.parse(localStorage.getItem('petcode_config_planos'));
+    
+    Object.keys(planos).forEach(id => {
+        planos[id].nome = document.getElementById(`admin-name-${id}`).value;
+        planos[id].preco = document.getElementById(`admin-price-${id}`).value;
+        
+        const checks = document.querySelectorAll(`.admin-check-${id}:checked`);
+        planos[id].cobertura = Array.from(checks).map(c => parseInt(p.value));
+        // Pequeno ajuste para pegar o value correto do checkbox
+        const values = [];
+        document.querySelectorAll(`.admin-check-${id}:checked`).forEach(c => values.push(parseInt(c.value)));
+        planos[id].cobertura = values;
+    });
+
+    localStorage.setItem('petcode_config_planos', JSON.stringify(planos));
+    atualizarUIPlanos();
+    alert('Configurações de planos atualizadas com sucesso! Os novos valores e coberturas já estão visíveis para os clientes.');
+}
+
+window.onload = function() {
+    inicializarPlanos();
+    atualizarInterfaceUsuario();
+}
+    </script>
+
+    <!-- MODAL DE AUTENTICAÇÃO (LOGIN E CADASTRO) -->
+    <div id="modal-auth" class="hidden fixed inset-0 bg-black/50 z-[999] flex items-center justify-center px-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden view-transition">
+            <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                <div>
+                    <h2 id="auth-titulo" class="text-2xl font-black text-slate-900">Entrar na Conta</h2>
+                    <p class="text-sm text-slate-500">Acesse o ecossistema PetCode</p>
+                </div>
+                <button onclick="fecharModalLogin()" class="text-slate-400 hover:text-slate-700 text-xl transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <!-- Box de Login -->
+                <div id="login-box" class="space-y-5">
+                    <input type="email" id="login-email" placeholder="Seu e-mail" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                    <input type="password" id="login-senha" placeholder="Sua senha" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 focus:outline-none focus:border-saude-500">
+                    <button onclick="realizarLogin()" class="w-full bg-saude-500 hover:bg-saude-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-saude-500/20 transition-all">
+                        Entrar
+                    </button>
+                    <button onclick="mostrarCadastro()" class="w-full text-saude-600 font-bold hover:underline text-sm">
+                        Não tem uma conta? Criar agora
+                    </button>
+                </div>
+
+                <!-- Box de Cadastro -->
+                <div id="cadastro-box" class="hidden space-y-5">
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <input type="text" id="cadastro-nome" placeholder="Seu nome completo" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50">
+                        <input type="email" id="cadastro-email" placeholder="Seu e-mail" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50">
+                    </div>
+                    <input type="password" id="cadastro-senha" placeholder="Crie uma senha" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50">
+                    
+                    <div class="pt-4 border-t border-slate-100">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-3">Informações do Pet</p>
+                        <input type="text" id="pet-nome" placeholder="Nome do pet" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 mb-3">
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <select id="pet-especie" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 text-slate-500">
+                                <option value="" disabled selected>Espécie (Obrigatório)</option>
+                                <option value="Cachorro">Cachorro</option>
+                                <option value="Gato">Gato</option>
+                                <option value="Coelho">Coelho</option>
+                                <option value="Hamster">Hamster</option>
+                                <option value="Pássaro">Pássaro</option>
+                                <option value="Porquinho da Índia">Porquinho da Índia</option>
+                                <option value="Tartaruga">Tartaruga</option>
+                            </select>
+                            
+                            <select id="pet-porte" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 text-slate-500">
+                                <option value="" disabled selected>Porte (Obrigatório)</option>
+                                <option value="Pequeno">Pequeno (até 10kg)</option>
+                                <option value="Médio">Médio (11-25kg)</option>
+                                <option value="Grande">Grande (+25kg)</option>
+                            </select>
+                        </div>
+                        
+                        <input type="text" id="pet-raca" placeholder="Raça (Opcional)" class="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 mt-3">
+                    </div>
+
+                    <button onclick="criarConta()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition-all">
+                        Finalizar e Criar Conta
+                    </button>
+                    <button onclick="mostrarLogin()" class="w-full text-saude-600 font-bold hover:underline text-sm">
+                        Já tem uma conta? Fazer login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
