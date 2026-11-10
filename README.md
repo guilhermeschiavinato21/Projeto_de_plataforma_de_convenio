@@ -36,7 +36,7 @@
 ### 🧾 Fluxo de contratação
 Processo em 3 etapas com indicador de progresso:
 1. **Tutor**: dados pessoais
-2. **Pet**: dados do animal
+2. **Pet**: dados do animal 
 3. **Checkout**: ativação do plano
 
 ### 👤 Área do cliente
