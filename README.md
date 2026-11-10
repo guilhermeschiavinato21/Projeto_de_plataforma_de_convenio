@@ -9,7 +9,9 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
 ![Font Awesome](https://img.shields.io/badge/Font_Awesome-528DD7?style=flat&logo=fontawesome&logoColor=white) 
 
+
 ---
+
 
 ## 📸 Preview
 
@@ -48,7 +50,9 @@ Processo em 3 etapas com indicador de progresso:
 - Exclusão de cadastros.
 - **Gestão de Ofertas e Planos**: edição de nome, preço e coberturas de cada plano, refletindo imediatamente no site.
 
+
 ---
+
 
 ## 🛠️ Tecnologias
 
@@ -79,7 +83,9 @@ cd petcode
 
 > Requer conexão com a internet para carregar o Tailwind CSS e o Font Awesome via CDN.
 
+
 ---
+
 
 ## 🔑 Acesso de demonstração
 
@@ -100,7 +106,9 @@ Usuários comuns podem ser criados pelo botão **Entrar / Cadastrar**.
 petcode/
 ├── index.html    # Aplicação completa (HTML + JS)
 └── README.md
+
 ```
+
 
 ### Telas (views) da aplicação
 
