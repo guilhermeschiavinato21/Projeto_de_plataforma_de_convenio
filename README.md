@@ -1,7 +1,7 @@
 # 🐾 PetCode | Planos de Saúde Veterinários Inteligentes
 
 > O plano de saúde com o **código genético** do cuidado.
-
+ 
 **PetCode** é um site institucional e de contratação de planos de saúde para pets, desenvolvido como **Single Page Application** em um único arquivo HTML, usando **Tailwind CSS**, **JavaScript puro** e **localStorage** para simular um sistema completo (cadastro, login, área do cliente e painel administrativo) sem precisar de back-end.
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
